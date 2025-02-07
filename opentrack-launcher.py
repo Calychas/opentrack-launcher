@@ -8,6 +8,9 @@ from urllib.error import URLError
 from shutil import which, rmtree
 from subprocess import Popen
 import json
+import ssl
+
+ssl._create_default_https_context = ssl._create_unverified_context
 
 def panic(msg):
     print("[opentrack-launcher] CRITICAL:", msg)
@@ -69,8 +72,8 @@ def dlopentrack():
     info("checking if opentrack is up to date...")
     try:
         content = urlopen(OPENTRACKURL).read().decode("UTF-8")
-    except URLError:
-        error(msg)("could not get opentrack release manifest; error: " + str(e.reason))
+    except URLError as e:
+        error("could not get opentrack release manifest; error: " + str(e.reason))
         return
     
     try:
@@ -172,6 +175,7 @@ def check7z():
         panic("7z is not installed")
 
 if __name__ == '__main__':
+    print(argv)
     check7z()
     makehome()
     appid = findappid()
